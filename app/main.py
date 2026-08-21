@@ -27,5 +27,5 @@ app.include_router(orders_router)
 async def root():
     return {
         "message": "Mini E-Commerce API - Discount Feature",
-        "version": "1.0.0"
+        "version": "2.0.0"
     }
