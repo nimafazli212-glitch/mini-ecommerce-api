@@ -26,5 +26,6 @@ app.include_router(orders_router)
 @app.get("/")
 async def root():
     return {
-        "message": "Mini E-Commerce API"
+        "message": "Mini E-Commerce API",
+        "version": "1.0.0"
     }
