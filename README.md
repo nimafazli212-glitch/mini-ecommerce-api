@@ -537,3 +537,13 @@ Possible improvements for a larger production system:
 ## License
 
 This project was created as a backend portfolio project for learning and demonstrating modern Python backend development.
+
+
+
+
+
+## Git Workflow
+
+This project uses Git for version control.
+
+Development is done through feature branches and pull requests.
