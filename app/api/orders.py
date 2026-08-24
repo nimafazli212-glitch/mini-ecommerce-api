@@ -15,6 +15,7 @@ from app.schemas.order import (
     OrderStatusUpdate,
 )
 from app.core.dependencies import get_current_user
+from app.services.order_service import create_order as create_order_service
 
 
 router = APIRouter(
@@ -33,77 +34,11 @@ async def create_order(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    if not data.items:
-        raise HTTPException(
-            status_code=400,
-            detail="Order must contain at least one item"
-        )
-
-    order = Order(
-        user_id=current_user.id,
-        status=OrderStatus.PENDING,
-        total_price=0
+    order = await create_order_service(
+        db=db,
+        data=data,
+        current_user=current_user
     )
-
-    db.add(order)
-
-    await db.flush()
-
-    total_price = 0
-
-    for item_data in data.items:
-
-        stmt = (
-            select(Product)
-            .where(
-                Product.id == item_data.product_id,
-                Product.is_active.is_(True)
-            )
-            .with_for_update()
-        )
-
-        result = await db.execute(stmt)
-
-        product = result.scalar_one_or_none()
-
-        if product is None:
-            await db.rollback()
-
-            raise HTTPException(
-                status_code=404,
-                detail=f"Product {item_data.product_id} not found"
-            )
-
-        if product.stock < item_data.quantity:
-            await db.rollback()
-
-            raise HTTPException(
-                status_code=400,
-                detail=f"Not enough stock for product {product.id}"
-            )
-
-        item_total = product.price * item_data.quantity
-
-        order_item = OrderItem(
-            order=order,
-            product_id=product.id,
-            product_name=product.name,
-            quantity=item_data.quantity,
-            unit_price=product.price
-        )
-
-        db.add(order_item)
-
-        product.stock -= item_data.quantity
-
-        total_price += item_total
-
-    order.total_price = total_price
-
-    await db.commit()
-
-    await db.refresh(order)
-    await db.refresh(order, ["items"])
 
     return order
 
