@@ -16,3 +16,7 @@ class InsufficientStockException(OrderException):
 
 class InvalidOrderStatusException(OrderException):
     pass
+
+
+class EmptyOrderException(OrderException):
+    pass
