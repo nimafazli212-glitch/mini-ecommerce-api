@@ -1,549 +1,302 @@
+
 # Mini E-Commerce API
 
-A production-oriented REST API for a mini e-commerce system built with **FastAPI**, **SQLAlchemy 2.0**, **PostgreSQL**, **Alembic**, and **JWT Authentication**.
+A production-oriented REST API for a mini e-commerce platform built with **FastAPI**, **SQLAlchemy 2.0**, **PostgreSQL**, **Alembic**, and **JWT Authentication**.
 
-The project includes user authentication, role-based authorization, product management, order management, stock control, pagination, filtering, and soft deletion.
-
----
-
-## Features
-
-* User registration and authentication
-* JWT-based authentication
-* Password hashing with `pwdlib`
-* Role-based authorization (`customer` / `admin`)
-* Product CRUD
-* Product soft delete
-* Product search and price filtering
-* Pagination with total pages
-* Order creation
-* Order cancellation
-* Order status management
-* Stock management
-* Row-level locking for stock-sensitive operations
-* Order item price snapshot
-* PostgreSQL database
-* Async SQLAlchemy
-* Alembic database migrations
-* Pydantic request/response validation
+This project demonstrates a clean backend architecture with authentication, authorization, product management, order processing, inventory control, database migrations, Docker support, and automated testing.
 
 ---
 
-## Tech Stack
+# Features
 
-* Python
-* FastAPI
-* SQLAlchemy 2.0
-* PostgreSQL
-* Alembic
-* Pydantic v2
-* Pydantic Settings
-* PyJWT
-* pwdlib
-* AsyncPG
+## Authentication & Security
+
+- User registration
+- JWT-based authentication
+- Password hashing with pwdlib
+- Protected API routes
+- Role-based authorization
+- Customer/Admin access control
+
+## User Management
+
+- Create user account
+- Get current authenticated user
+- Admin user management
+- User permission validation
+
+## Product Management
+
+- Product CRUD operations
+- Product activation/deactivation (Soft Delete)
+- Product search
+- Price filtering
+- Pagination
+- Stock management
+
+## Order Management
+
+- Create orders
+- View user orders
+- Order details
+- Cancel pending orders
+- Admin order management
+- Order status workflow
+
+Supported order statuses:
+PENDING
+CONFIRMED
+SHIPPED
+DELIVERED
+CANCELLED
+
+
+## Inventory Safety
+
+- Stock validation before purchase
+- Database row locking for stock-sensitive operations
+- Prevent overselling during concurrent purchases
+
+## Database
+
+- PostgreSQL
+- Async SQLAlchemy 2.0
+- Alembic migrations
+- Database version control
+
+## API Quality
+
+- OpenAPI documentation
+- Swagger UI
+- Request/Response validation
+- Automated API tests
 
 ---
 
-## Project Structure
+# Tech Stack
 
-```text
+| Technology | Usage |
+|---|---|
+| Python 3.11 | Backend language |
+| FastAPI | Web framework |
+| SQLAlchemy 2.0 | ORM |
+| PostgreSQL | Database |
+| Alembic | Database migrations |
+| Pydantic v2 | Data validation |
+| JWT | Authentication |
+| AsyncPG | Async PostgreSQL driver |
+| Docker | Containerization |
+| Pytest | Testing |
+
+---
+
+# Project Structure
 mini-ecommerce-api/
-│
+
 ├── app/
-│   ├── api/
-│   │   ├── auth.py
-│   │   ├── users.py
-│   │   ├── products.py
-│   │   └── orders.py
-│   │
-│   ├── core/
-│   │   ├── config.py
-│   │   ├── dependencies.py
-│   │   ├── oauth2.py
-│   │   ├── permissions.py
-│   │   └── security.py
-│   │
-│   ├── db/
-│   │   ├── base.py
-│   │   ├── database.py
-│   │   ├── dependencies.py
-│   │   └── models/
-│   │
-│   ├── schemas/
-│   │   ├── auth.py
-│   │   ├── user.py
-│   │   ├── product.py
-│   │   └── order.py
-│   │
-│   └── main.py
+│
+│ ├── api/
+│ │ ├── auth.py
+│ │ ├── users.py
+│ │ ├── products.py
+│ │ └── orders.py
+│ │
+│ ├── core/
+│ │ ├── config.py
+│ │ ├── dependencies.py
+│ │ ├── permissions.py
+│ │ ├── security.py
+│ │ └── exceptions.py
+│ │
+│ ├── db/
+│ │ ├── database.py
+│ │ ├── dependencies.py
+│ │ └── models/
+│ │
+│ ├── schemas/
+│ │
+│ ├── services/
+│ │ └── order_service.py
+│ │
+│ └── main.py
 │
 ├── alembic/
-│   └── versions/
+│ └── versions/
 │
-├── .env
-├── .gitignore
-├── alembic.ini
+├── tests/
+│
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
+├── .env.example
 └── README.md
-```
 
----
+بعد از این پیام، قسمت دوم را می‌فرستم که شامل Installation تا آخر README است.
 
-## Installation
 
-### 1. Clone the repository
+نه فایلشو بساز برام 
 
-```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+آماده شد داش. فایل README.md ساخته شد.
+
+می‌تونی مستقیم جایگزین README پروژه کنی:
+
+دریافت README.md
+
+بعد از جایگزینی:
+
+git add README.md
+git commit -m "Improve project documentation"
+بزن. 
+
+
+README.md
+Document
+
+
+Library
+/
+backend
+/
+README.md
+
+
+Mini E-Commerce API
+A production-oriented REST API for a mini e-commerce platform built with
+FastAPI, SQLAlchemy 2.0, PostgreSQL, Alembic, and JWT Authentication.
+
+Features
+JWT authentication
+
+Password hashing
+
+Role-based authorization (customer/admin)
+
+Product CRUD
+
+Product search and pagination
+
+Soft delete products
+
+Order creation and cancellation
+
+Inventory validation
+
+Row-level locking for stock operations
+
+PostgreSQL database
+
+Async SQLAlchemy
+
+Alembic migrations
+
+Automated tests
+
+Tech Stack
+Python 3.11
+
+FastAPI
+
+SQLAlchemy 2.0
+
+PostgreSQL
+
+Alembic
+
+Pydantic v2
+
+JWT
+
+AsyncPG
+
+Docker
+
+Pytest
+
+Structure
+mini-ecommerce-api/
+├── app/
+│   ├── api/
+│   ├── core/
+│   ├── db/
+│   ├── schemas/
+│   ├── services/
+│   └── main.py
+├── alembic/
+├── tests/
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+├── .env.example
+└── README.md
+Installation
+git clone <YOUR_REPOSITORY_URL>
 cd mini-ecommerce-api
-```
+Create environment:
 
-### 2. Create a virtual environment
-
-Windows:
-
-```powershell
 python -m venv .venv
-```
-
-Activate it:
-
-```powershell
 .venv\Scripts\activate
-```
+Install:
 
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
-```
+Environment
+Create .env:
 
----
-
-## Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-DATABASE_URL=postgresql+asyncpg://USERNAME:PASSWORD@localhost:5432/DATABASE_NAME
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/ecommerce
 SECRET_KEY=YOUR_SECRET_KEY
-```
+ALGORITHM=HS256
+Database
+Run migrations:
 
-Do not commit `.env` to GitHub.
-
----
-
-## Database Setup
-
-Make sure PostgreSQL is running.
-
-Run the latest Alembic migrations:
-
-```bash
 alembic upgrade head
-```
-
-To check the current migration:
-
-```bash
-alembic current
-```
-
----
-
-## Running the Application
-
-Start the development server:
-
-```bash
+Run
 uvicorn app.main:app --reload
-```
+Swagger:
 
-The API will be available at:
-
-```text
-http://127.0.0.1:8000
-```
-
-Interactive API documentation:
-
-```text
 http://127.0.0.1:8000/docs
-```
+Docker
+docker compose up --build
+Testing
+pytest -v
+Covered tests:
 
-Alternative documentation:
+Authentication
 
-```text
-http://127.0.0.1:8000/redoc
-```
+Users
 
----
+Permissions
 
-## Authentication
+Products
 
-Authentication uses JWT Bearer tokens.
+Search
 
-### Login
+Pagination
 
-```http
-POST /auth/login
-```
+Orders
 
-Example request:
+Stock validation
 
-```json
-{
-  "email": "user@example.com",
-  "password": "your_password"
-}
-```
+Security
+Implemented:
 
-Example response:
+JWT authentication
 
-```json
-{
-  "access_token": "YOUR_ACCESS_TOKEN",
-  "token_type": "bearer"
-}
-```
+Password hashing
 
-Use the returned token in protected endpoints:
+Admin permissions
 
-```text
-Authorization: Bearer YOUR_ACCESS_TOKEN
-```
+Transaction handling
 
----
+Inventory locking
 
-## Authorization
+Future Improvements
+Refresh tokens
 
-The API supports two user roles:
+Payment gateway
 
-* `customer`
-* `admin`
+Redis cache
 
-Admin-only operations use the `get_current_admin` dependency defined in:
+CI/CD pipeline
 
-```text
-app/core/permissions.py
-```
+License
+Portfolio project.
 
-Customers cannot perform administrative product management or administrative order operations.
-
----
-
-## Product API
-
-### Create Product
-
-```http
-POST /products/
-```
-
-Admin access required.
-
-### Get Products
-
-```http
-GET /products/
-```
-
-Supports:
-
-* Pagination
-* Name search
-* Minimum price
-* Maximum price
-
-Example:
-
-```text
-GET /products/?page=1&limit=10&search=laptop&min_price=500&max_price=2000
-```
-
-Example response:
-
-```json
-{
-  "items": [],
-  "page": 1,
-  "limit": 10,
-  "total": 0,
-  "pages": 0
-}
-```
-
-### Get Product
-
-```http
-GET /products/{product_id}
-```
-
-### Update Product
-
-```http
-PATCH /products/{product_id}
-```
-
-Admin access required.
-
-### Deactivate Product
-
-```http
-DELETE /products/{product_id}
-```
-
-Admin access required.
-
-Products are soft-deleted rather than physically removed from the database. This preserves historical order data.
-
----
-
-## Order API
-
-### Create Order
-
-```http
-POST /orders/
-```
-
-Authenticated users can create orders.
-
-Example:
-
-```json
-{
-  "items": [
-    {
-      "product_id": 1,
-      "quantity": 2
-    }
-  ]
-}
-```
-
-The API:
-
-* Validates product availability
-* Checks stock
-* Locks the product row during the transaction
-* Decreases stock
-* Stores the purchase price in `OrderItem`
-* Calculates the order total
-
-### Get My Orders
-
-```http
-GET /orders/
-```
-
-Returns orders belonging to the authenticated user.
-
-### Get Order
-
-```http
-GET /orders/{order_id}
-```
-
-Users can only access their own orders.
-
-### Cancel Order
-
-```http
-PATCH /orders/{order_id}/cancel
-```
-
-Only pending orders can be cancelled.
-
-When an order is cancelled, its quantities are returned to product stock.
-
-### Update Order Status
-
-```http
-PATCH /orders/{order_id}/status
-```
-
-Supported status transitions:
-
-```text
-pending → confirmed
-confirmed → shipped
-shipped → delivered
-```
-
-Invalid status transitions are rejected by the API.
-
----
-
-## Database Relationships
-
-The main database relationships are:
-
-```text
-User
- │
- └──< Order
-          │
-          └──< OrderItem >── Product
-```
-
-A user can have multiple orders.
-
-An order can contain multiple order items.
-
-A product can appear in multiple order items.
-
----
-
-## Order Price Snapshot
-
-When an order is created, the current product price is copied into:
-
-```text
-OrderItem.unit_price
-```
-
-This means changing the product price later does not change historical orders.
-
-For example:
-
-```text
-Product price at purchase: $999.99
-
-OrderItem.unit_price: $999.99
-```
-
-If the product price later changes to:
-
-```text
-$1199.99
-```
-
-the existing order still contains:
-
-```text
-$999.99
-```
-
-This preserves historical purchase data.
-
----
-
-## Product Lifecycle
-
-Products use soft deletion.
-
-Instead of permanently deleting a product:
-
-```text
-is_active = False
-```
-
-Inactive products:
-
-* Are not shown in the public product list
-* Cannot be retrieved through the public product endpoint
-* Cannot be purchased
-* Remain in the database
-* Remain available for historical orders
-
----
-
-## Migrations
-
-Create a new migration:
-
-```bash
-alembic revision --autogenerate -m "migration message"
-```
-
-Apply migrations:
-
-```bash
-alembic upgrade head
-```
-
-Rollback the latest migration:
-
-```bash
-alembic downgrade -1
-```
-
-Check migration history:
-
-```bash
-alembic history
-```
-
----
-
-## API Documentation
-
-FastAPI automatically generates interactive documentation.
-
-Swagger UI:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-ReDoc:
-
-```text
-http://127.0.0.1:8000/redoc
-```
-
-The `/docs` interface can be used to test authenticated endpoints using the JWT Bearer token.
-
----
-
-## Security
-
-The project includes:
-
-* Password hashing
-* JWT authentication
-* Bearer token authentication
-* Role-based authorization
-* Protected user endpoints
-* Protected order endpoints
-* Admin-only product management
-* User ownership checks
-* Input validation with Pydantic
-* Environment-based configuration
-* `.env` excluded from version control
-
----
-
-## Future Improvements
-
-Possible improvements for a larger production system:
-
-* Refresh tokens
-* Email verification
-* Password reset
-* Rate limiting
-* Redis caching
-* Background tasks
-* Payment integration
-* Order history and admin dashboard
-* Automated tests with Pytest
-* Docker deployment
-* CI/CD pipeline
-* Production logging and monitoring
-
----
-
-## License
-
-This project was created as a backend portfolio project for learning and demonstrating modern Python backend development.
-
-
-
-
-
-## Git Workflow
-
-This project uses Git for version control.
-
-Development is done through feature branches and pull requests.
