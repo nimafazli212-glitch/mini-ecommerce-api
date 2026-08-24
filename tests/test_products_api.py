@@ -219,7 +219,7 @@ async def test_get_product_not_found():
             )
 
         assert response.status_code == 404
-        assert response.json()["detail"] == "Product not found"
+        assert response.json()["error"]["message"] == "Product not found"
 
     finally:
         app.dependency_overrides.clear()

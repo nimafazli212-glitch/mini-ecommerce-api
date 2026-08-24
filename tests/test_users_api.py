@@ -104,8 +104,7 @@ async def test_create_user_duplicate_email():
             )
 
         assert response.status_code == 409
-        assert response.json()["detail"] == "Email already exists"
-
+        assert response.json()["error"]["message"] == "Email already exists"
     finally:
         app.dependency_overrides.clear()
 
@@ -201,7 +200,7 @@ async def test_update_other_user_forbidden():
             )
 
         assert response.status_code == 403
-        assert response.json()["detail"] == "You can only update your own account"
+        assert response.json()["error"]["message"] == "You can only update your own account"
 
     finally:
         app.dependency_overrides.clear()
@@ -256,7 +255,7 @@ async def test_delete_other_user_forbidden():
             )
 
         assert response.status_code == 403
-        assert response.json()["detail"] == "You can only delete your own account"
+        assert response.json()["error"]["message"] == "You can only delete your own account"
 
     finally:
         app.dependency_overrides.clear()
