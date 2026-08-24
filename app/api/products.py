@@ -34,7 +34,12 @@ async def create_product(
 
     db.add(new_product)
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception:
+        await db.rollback()
+        raise
 
     await db.refresh(new_product)
 
@@ -158,7 +163,12 @@ async def update_product(
     if product_data.stock is not None:
         product.stock = product_data.stock
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception:
+        await db.rollback()
+        raise
 
     await db.refresh(product)
 
@@ -185,7 +195,13 @@ async def delete_product(
 
     product.is_active = False
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception:
+        await db.rollback()
+        raise
+
     await db.refresh(product)
 
     return {
