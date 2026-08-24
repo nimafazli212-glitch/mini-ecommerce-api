@@ -168,7 +168,12 @@ async def delete_user(
 
     await db.delete(user)
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception:
+        await db.rollback()
+        raise
 
     return {
         "message": "User deleted successfully"
