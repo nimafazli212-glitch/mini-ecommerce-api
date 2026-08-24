@@ -4,9 +4,15 @@ from app.api.users import router as users_router
 from app.api.products import router as products_router
 from app.api.auth import router as auth_router
 from app.api.orders import router as orders_router
+from app.core.exceptions import OrderException
+from app.core.exception_handlers import order_exception_handler
 
 
 app = FastAPI()
+app.add_exception_handler(
+    OrderException,
+    order_exception_handler
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
