@@ -1,9 +1,10 @@
 from datetime import datetime
-
+from decimal import Decimal
 import pytest
 from httpx import AsyncClient, ASGITransport
 from unittest.mock import AsyncMock, MagicMock
-
+from app.db.models.user import User
+from app.core.dependencies import get_current_user
 from app.main import app
 from app.db.dependencies import get_db
 from app.db.models.product import Product
@@ -220,6 +221,112 @@ async def test_get_product_not_found():
 
         assert response.status_code == 404
         assert response.json()["error"]["message"] == "Product not found"
+
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_create_product_admin_success():
+
+    admin_user = User(
+        id=1,
+        email="admin@test.com",
+        role="admin"
+    )
+
+    async def override_current_user():
+        return admin_user
+
+    async def override_get_db():
+        db = MagicMock()
+        
+        product = Product(
+            id=1,
+            name="Laptop",
+            description="Test",
+            price=Decimal("1000"),
+            stock=5,
+            is_active=True,
+            created_at=datetime.utcnow()
+        )
+
+        async def refresh_mock(obj):
+            obj.id = 1
+            obj.is_active = True
+            obj.created_at = datetime.utcnow()
+
+        db.refresh = AsyncMock(
+            side_effect=refresh_mock
+        )
+
+        db.commit = AsyncMock()
+
+        yield db
+
+    app.dependency_overrides[get_current_user] = override_current_user
+    app.dependency_overrides[get_db] = override_get_db
+
+    try:
+        transport = ASGITransport(app=app)
+
+        async with AsyncClient(
+            transport=transport,
+            base_url="http://test"
+        ) as client:
+
+            response = await client.post(
+                "/products/",
+                json={
+                    "name": "Laptop",
+                    "description": "Test",
+                    "price": 1000,
+                    "stock": 5
+                }
+            )
+
+        assert response.status_code == 200
+        assert response.json()["name"] == "Laptop"
+
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_create_product_customer_forbidden():
+
+    customer_user = User(
+        id=1,
+        email="customer@test.com",
+        role="customer"
+    )
+
+    async def override_current_user():
+        return customer_user
+
+    app.dependency_overrides[get_current_user] = override_current_user
+
+    try:
+        transport = ASGITransport(app=app)
+
+        async with AsyncClient(
+            transport=transport,
+            base_url="http://test"
+        ) as client:
+
+            response = await client.post(
+                "/products/",
+                json={
+                    "name": "Laptop",
+                    "description": "Test",
+                    "price": 1000,
+                    "stock": 5
+                }
+            )
+
+        
+        assert response.status_code == 403
+        assert response.json()["error"]["message"] == "Admin access required"
 
     finally:
         app.dependency_overrides.clear()
