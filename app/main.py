@@ -4,6 +4,7 @@ from app.api.users import router as users_router
 from app.api.products import router as products_router
 from app.api.auth import router as auth_router
 from app.api.orders import router as orders_router
+from app.api.health import router as health_router
 from app.core.exceptions import OrderException
 from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
@@ -44,6 +45,7 @@ app.include_router(users_router)
 app.include_router(products_router)
 app.include_router(auth_router)
 app.include_router(orders_router)
+app.include_router(health_router)
 
 @app.get("/")
 async def root():
