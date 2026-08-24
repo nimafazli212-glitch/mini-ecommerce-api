@@ -76,9 +76,18 @@ async def create_order(
 
     order.total_price = total_price
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception:
+        await db.rollback()
+        raise
 
     await db.refresh(order)
-    await db.refresh(order, ["items"])
+
+    await db.refresh(
+        order,
+        attribute_names=["items"]
+    )
 
     return order
