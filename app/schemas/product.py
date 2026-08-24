@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from decimal import Decimal
 from pydantic import BaseModel, Field
 
 
@@ -12,7 +12,7 @@ class ProductCreate(BaseModel):
 
     description: str | None = None
 
-    price: float = Field(
+    price: Decimal = Field(
         gt=0
     )
 
@@ -25,7 +25,7 @@ class ProductResponse(BaseModel):
     id: int
     name: str
     description: str | None
-    price: float
+    price: Decimal
     stock: int
     is_active: bool
     created_at: datetime
@@ -41,7 +41,7 @@ class ProductUpdate(BaseModel):
 
     description: str | None = None
 
-    price: float | None = Field(
+    price: Decimal | None = Field(
         default=None,
         gt=0
     )

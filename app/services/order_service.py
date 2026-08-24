@@ -6,7 +6,7 @@ from app.core.exceptions import (
     InsufficientStockException,
     EmptyOrderException,
 )
-
+from decimal import Decimal
 from app.db.models.user import User
 from app.db.models.order import Order, OrderStatus
 from app.db.models.order_item import OrderItem
@@ -33,7 +33,7 @@ async def create_order(
 
     await db.flush()
 
-    total_price = 0
+    total_price = Decimal("0.00")
 
     for item_data in data.items:
 
