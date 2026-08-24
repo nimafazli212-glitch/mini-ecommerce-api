@@ -143,3 +143,24 @@ async def test_login_user_not_found():
 
     finally:
         app.dependency_overrides.clear()
+
+
+@pytest.mark.asyncio
+async def test_invalid_token():
+
+    transport = ASGITransport(app=app)
+
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test"
+    ) as client:
+
+        response = await client.get(
+            "/users/me",
+            headers={
+                "Authorization": "Bearer invalid_token"
+            }
+        )
+
+    assert response.status_code == 401
+    assert response.json()["error"]["message"] == "Invalid or expired token"
