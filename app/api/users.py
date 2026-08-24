@@ -15,7 +15,16 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post(
+    "/",
+    summary="Create user",
+    description="Create a new customer account with hashed password.",
+    responses={
+        409: {
+            "description": "Email already exists"
+        }
+    }
+)
 async def create_user(
     user: UserCreate,
     db: AsyncSession = Depends(get_db)
@@ -49,7 +58,12 @@ async def create_user(
         "email": new_user.email,
     }
 
-@router.get("/", response_model=list[UserResponse])
+@router.get(
+    "/",
+    response_model=list[UserResponse],
+    summary="Get all users",
+    description="Admin only endpoint for retrieving all users."
+)
 async def get_users(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_admin)
@@ -63,14 +77,24 @@ async def get_users(
     return users
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    summary="Get current user",
+    description="Return authenticated user's profile."
+)
 async def get_me(
     current_user: User = Depends(get_current_user)
 ):
     return current_user
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get(
+    "/{user_id}",
+    response_model=UserResponse,
+    summary="Get user by ID",
+    description="Admin only endpoint for retrieving a specific user."
+)
 async def get_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -90,7 +114,20 @@ async def get_user(
 
     return user
 
-@router.patch("/{user_id}", response_model=UserResponse)
+@router.patch(
+    "/{user_id}",
+    response_model=UserResponse,
+    summary="Update user profile",
+    description="Update own profile or update any user as admin.",
+    responses={
+        403: {
+            "description": "Permission denied"
+        },
+        409: {
+            "description": "Email already exists"
+        }
+    }
+)
 async def update_user(
     user_id: int,
     user_data: UserUpdate,
@@ -139,7 +176,16 @@ async def update_user(
 
     return user
 
-@router.delete("/{user_id}")
+@router.delete(
+    "/{user_id}",
+    summary="Delete user",
+    description="Delete own account or delete user as admin.",
+    responses={
+        403: {
+            "description": "Permission denied"
+        }
+    }
+)
 async def delete_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -168,7 +214,12 @@ async def delete_user(
 
     await db.delete(user)
 
-    await db.commit()
+    try:
+        await db.commit()
+
+    except Exception:
+        await db.rollback()
+        raise
 
     return {
         "message": "User deleted successfully"

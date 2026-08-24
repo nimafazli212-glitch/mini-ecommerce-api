@@ -15,6 +15,7 @@ from app.schemas.order import (
     OrderStatusUpdate,
 )
 from app.core.dependencies import get_current_user
+from app.services.order_service import create_order as create_order_service
 
 
 router = APIRouter(
@@ -26,90 +27,28 @@ router = APIRouter(
 @router.post(
     "/",
     response_model=OrderDetailResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    summary="Create order",
+    description="Create a new order for the authenticated user."
 )
 async def create_order(
     data: OrderCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    if not data.items:
-        raise HTTPException(
-            status_code=400,
-            detail="Order must contain at least one item"
-        )
-
-    order = Order(
-        user_id=current_user.id,
-        status=OrderStatus.PENDING,
-        total_price=0
+    order = await create_order_service(
+        db=db,
+        data=data,
+        current_user=current_user
     )
-
-    db.add(order)
-
-    await db.flush()
-
-    total_price = 0
-
-    for item_data in data.items:
-
-        stmt = (
-            select(Product)
-            .where(
-                Product.id == item_data.product_id,
-                Product.is_active.is_(True)
-            )
-            .with_for_update()
-        )
-
-        result = await db.execute(stmt)
-
-        product = result.scalar_one_or_none()
-
-        if product is None:
-            await db.rollback()
-
-            raise HTTPException(
-                status_code=404,
-                detail=f"Product {item_data.product_id} not found"
-            )
-
-        if product.stock < item_data.quantity:
-            await db.rollback()
-
-            raise HTTPException(
-                status_code=400,
-                detail=f"Not enough stock for product {product.id}"
-            )
-
-        item_total = product.price * item_data.quantity
-
-        order_item = OrderItem(
-            order=order,
-            product_id=product.id,
-            product_name=product.name,
-            quantity=item_data.quantity,
-            unit_price=product.price
-        )
-
-        db.add(order_item)
-
-        product.stock -= item_data.quantity
-
-        total_price += item_total
-
-    order.total_price = total_price
-
-    await db.commit()
-
-    await db.refresh(order)
-    await db.refresh(order, ["items"])
 
     return order
 
 @router.get(
     "/",
-    response_model=list[OrderResponse]
+    response_model=list[OrderResponse],
+    summary="Get my orders",
+    description="Retrieve all orders of the authenticated user."
 )
 async def get_my_orders(
     db: AsyncSession = Depends(get_db),
@@ -131,7 +70,14 @@ async def get_my_orders(
 
 @router.get(
     "/{order_id}",
-    response_model=OrderDetailResponse
+    response_model=OrderDetailResponse,
+    summary="Get order details",
+    description="Retrieve a user's order with order items.",
+    responses={
+        404: {
+            "description": "Order not found"
+        }
+    }
 )
 async def get_order(
     order_id: int,
@@ -162,7 +108,17 @@ async def get_order(
 
 @router.patch(
     "/{order_id}/cancel",
-    response_model=OrderResponse
+    response_model=OrderResponse,
+    summary="Cancel order",
+    description="Cancel a pending order and restore product stock.",
+    responses={
+        400: {
+            "description": "Order cannot be cancelled"
+        },
+        404: {
+            "description": "Order or product not found"
+        }
+    }
 )
 async def cancel_order(
     order_id: int,
@@ -226,7 +182,17 @@ async def cancel_order(
 
 @router.patch(
     "/{order_id}/status",
-    response_model=OrderResponse
+    response_model=OrderResponse,
+    summary="Update order status",
+    description="Update order status. Admin access required.",
+    responses={
+        400: {
+            "description": "Invalid status transition"
+        },
+        404: {
+            "description": "Order not found"
+        }
+    }
 )
 async def update_order_status(
     order_id: int,
@@ -276,7 +242,9 @@ async def update_order_status(
 
 @router.get(
     "/admin/all",
-    response_model=list[OrderResponse]
+    response_model=list[OrderResponse],
+    summary="Get all orders",
+    description="Admin endpoint to retrieve all orders."
 )
 async def get_all_orders(
     db: AsyncSession = Depends(get_db),
@@ -296,7 +264,14 @@ async def get_all_orders(
 
 @router.get(
     "/admin/{order_id}",
-    response_model=OrderDetailResponse
+    response_model=OrderDetailResponse,
+    summary="Get order by ID for admin",
+    description="Admin endpoint to retrieve any order.",
+    responses={
+        404: {
+            "description": "Order not found"
+        }
+    }
 )
 async def get_admin_order(
     order_id: int,
