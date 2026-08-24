@@ -14,7 +14,17 @@ router = APIRouter(
 )
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    summary="User login",
+    description="Authenticate user with email and password and return JWT access token.",
+    responses={
+        401: {
+            "description": "Invalid email or password"
+        }
+    }
+)
 async def login(
     login_data: LoginRequest,
     db: AsyncSession = Depends(get_db)

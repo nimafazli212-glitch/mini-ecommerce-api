@@ -19,7 +19,12 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=ProductResponse)
+@router.post(
+    "/",
+    response_model=ProductResponse,
+    summary="Create product",
+    description="Create a new product. Admin access required."
+)
 async def create_product(
     product_data: ProductCreate,
     db: AsyncSession = Depends(get_db),
@@ -46,13 +51,43 @@ async def create_product(
     return new_product
 
 
-@router.get("/", response_model=ProductListResponse)
+@router.get(
+    "/",
+    response_model=ProductListResponse,
+    summary="List products",
+    description="Get active products with pagination and optional filters."
+)
 async def get_products(
-    page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
-    search: str | None = Query(None, min_length=1),
-    min_price: float | None = Query(None, gt=0),
-    max_price: float | None = Query(None, gt=0),
+    page: int = Query(
+    1,
+    ge=1,
+    description="Page number"
+    ),
+
+    limit: int = Query(
+        10,
+        ge=1,
+        le=100,
+        description="Number of products per page"
+    ),
+
+    search: str | None = Query(
+        None,
+        min_length=1,
+        description="Search products by name"
+    ),
+
+    min_price: float | None = Query(
+        None,
+        gt=0,
+        description="Minimum product price"
+    ),
+
+    max_price: float | None = Query(
+        None,
+        gt=0,
+        description="Maximum product price"
+    ),
     db: AsyncSession = Depends(get_db)
 ):
     stmt = (
@@ -107,7 +142,17 @@ async def get_products(
         "total": total,
         "pages": pages,
     }
-@router.get("/{product_id}", response_model=ProductResponse)
+@router.get(
+    "/{product_id}",
+    response_model=ProductResponse,
+    summary="Get product",
+    description="Retrieve an active product by ID.",
+    responses={
+        404: {
+            "description": "Product not found"
+        }
+    }
+)
 async def get_product(
     product_id: int,
     db: AsyncSession = Depends(get_db)
@@ -132,7 +177,17 @@ async def get_product(
     return product
 
 
-@router.patch("/{product_id}", response_model=ProductResponse)
+@router.patch(
+    "/{product_id}",
+    response_model=ProductResponse,
+    summary="Update product",
+    description="Update product information. Admin access required.",
+    responses={
+        404: {
+            "description": "Product not found"
+        }
+    }
+)
 async def update_product(
     product_id: int,
     product_data: ProductUpdate,
@@ -175,7 +230,16 @@ async def update_product(
     return product
 
 
-@router.delete("/{product_id}")
+@router.delete(
+    "/{product_id}",
+    summary="Deactivate product",
+    description="Soft delete product by setting it inactive.",
+    responses={
+        404: {
+            "description": "Product not found"
+        }
+    }
+)
 async def delete_product(
     product_id: int,
     db: AsyncSession = Depends(get_db),

@@ -27,7 +27,9 @@ router = APIRouter(
 @router.post(
     "/",
     response_model=OrderDetailResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    summary="Create order",
+    description="Create a new order for the authenticated user."
 )
 async def create_order(
     data: OrderCreate,
@@ -44,7 +46,9 @@ async def create_order(
 
 @router.get(
     "/",
-    response_model=list[OrderResponse]
+    response_model=list[OrderResponse],
+    summary="Get my orders",
+    description="Retrieve all orders of the authenticated user."
 )
 async def get_my_orders(
     db: AsyncSession = Depends(get_db),
@@ -66,7 +70,14 @@ async def get_my_orders(
 
 @router.get(
     "/{order_id}",
-    response_model=OrderDetailResponse
+    response_model=OrderDetailResponse,
+    summary="Get order details",
+    description="Retrieve a user's order with order items.",
+    responses={
+        404: {
+            "description": "Order not found"
+        }
+    }
 )
 async def get_order(
     order_id: int,
@@ -97,7 +108,17 @@ async def get_order(
 
 @router.patch(
     "/{order_id}/cancel",
-    response_model=OrderResponse
+    response_model=OrderResponse,
+    summary="Cancel order",
+    description="Cancel a pending order and restore product stock.",
+    responses={
+        400: {
+            "description": "Order cannot be cancelled"
+        },
+        404: {
+            "description": "Order or product not found"
+        }
+    }
 )
 async def cancel_order(
     order_id: int,
@@ -161,7 +182,17 @@ async def cancel_order(
 
 @router.patch(
     "/{order_id}/status",
-    response_model=OrderResponse
+    response_model=OrderResponse,
+    summary="Update order status",
+    description="Update order status. Admin access required.",
+    responses={
+        400: {
+            "description": "Invalid status transition"
+        },
+        404: {
+            "description": "Order not found"
+        }
+    }
 )
 async def update_order_status(
     order_id: int,
@@ -211,7 +242,9 @@ async def update_order_status(
 
 @router.get(
     "/admin/all",
-    response_model=list[OrderResponse]
+    response_model=list[OrderResponse],
+    summary="Get all orders",
+    description="Admin endpoint to retrieve all orders."
 )
 async def get_all_orders(
     db: AsyncSession = Depends(get_db),
@@ -231,7 +264,14 @@ async def get_all_orders(
 
 @router.get(
     "/admin/{order_id}",
-    response_model=OrderDetailResponse
+    response_model=OrderDetailResponse,
+    summary="Get order by ID for admin",
+    description="Admin endpoint to retrieve any order.",
+    responses={
+        404: {
+            "description": "Order not found"
+        }
+    }
 )
 async def get_admin_order(
     order_id: int,
